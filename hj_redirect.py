@@ -4,7 +4,7 @@ import sys
 import json
 from urllib.parse import urlparse
 
-### STEP 0: RUN REDIRECTION LOG
+### STEP 0: RUN REDIRECTIONo LOG
 
 # 0.0: Check if the URL is valid (Extra)
 def valid_url(url):
@@ -50,7 +50,6 @@ def RedirLogs(curl, dstURL):
         return False    # Redirection rule already applied
     else:
         return True     # Redirection rule has not been applied
-
 
 ### STEP 1: FIND THE VM INSTANCE
 
@@ -114,18 +113,38 @@ def main():
                'preprod2-eu.kia.com':'34.102.172.183',
                'connectstore.kia.com':'34.49.88.90'}
     
+    # User input: source URL
     src = input("Type in the source URL:  ")
-    dst = input("Type in the destination URL:  ")
     
-    url = valid_url(src)
+    src_url = valid_url(src)
     ip = host_ip(ip_list, src)
 
-    while (url == False) or (ip == False):
-        print(f"{src} is not a valid URL or out of a valid IP range")
+    while (src_url == False) or (ip == False):
+        print(f"Source {src} is not a valid URL or out of a valid IP range")
         src = input("Type in the source URL:  ")
-        url = valid_url(src)
+        src_url = valid_url(src)
         ip = host_ip(ip_list, src)
-        if (url == True) and (ip == True):
+        if (src_url == True) and (ip == True):
+            break
+    
+    # User input: destination URL
+    dst = input("Type in the destination URL:  ")
+    dst_url = valid_url(dst)
+    
+    while dst_url == False:
+        print(f"Destination {dst} is not a valid URL")
+        dst = input("Type in the destination URL:  ")
+        dst_url = valid_url(dst)
+        if dst_url == True:
+            break
+
+    # User input: [Modify, Add, Delete]
+    modes = ['modify', 'add', 'delete']
+    mode = input("What do you want to do? (choose from 'modify', 'add', or 'delete')  ").lower()
+    while mode not in modes:
+        print(f"Mode '{mode}' is not a valid request")
+        mode = input("What do you want to do? (choose from 'modify', 'add', or 'delete')  ").lower()
+        if (mode in modes):
             break
 
     curlCommend = curl(ip_list, src)
