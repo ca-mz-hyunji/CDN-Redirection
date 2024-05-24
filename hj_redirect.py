@@ -87,14 +87,17 @@ def HostName(log_file):
 
 # 1.6: Find the configuration file in "setting.json".
 # Configuration file location is next to the basehost under the virtual hostname you found.
-def BaseHost():
-    json_file = "/usr/local/m2/setting.json"
+def BaseHost(host_name):
+    # json_file = "/usr/local/m2/setting.json"
+    json_file = "C:\\Users\\Kim\\Desktop\\Assignments\\1_Hyundai_CDN\\setting.json"
     
     if not os.path.exists(json_file):
         print(f"JSON file '{json_file}' not found.")
-
+    
     with open(json_file, 'r') as file:
         data = json.load(file)
+        
+        file.close()
 
 ### STEP 2: MODIFY JSON FILE
 # 2.1: Open the configuration file
@@ -149,21 +152,23 @@ def main():
 
     curlCommend = curl(ip_list, src)
 
-    HostNames = []
+    configList = []
 
     if RedirLogs(curlCommend, dst):
         print("Switch to the user account"); subprocess.run('sudo su -', shell=True)
         print("Change work directory into root directory"); os.chdir("/")
         print("Change to m2log directory"); os.chdir("m2log")
         grepCommand = GrepCommand(src)
-        logLists = LogFiles(grepCommand)    # NEED TO FIND simpliest log file
+        logLists = LogFiles(grepCommand)    
+        logLists = sorted(logLists, key=len)    # The log file with the simpliest name has the priority
         for log in logLists:
             hostname = HostName(log)
-            HostNames.append(hostname)
+            config = BaseHost(hostname)
+            configList.append(config)
+        
     else:
         print(f"Redirection from '{src}' to '{dst}' has already applied")
 
-    # EDGE CASE: multiple host names, go to the each base host and change the value??
 
 if __name__=='__main__':
     main()
