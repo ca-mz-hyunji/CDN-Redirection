@@ -3,34 +3,42 @@ import subprocess
 import sys
 import json
 from urllib.parse import urlparse
-import time
 
-# 1.6: Find the configuration file in "setting.json".
-# Configuration file location is next to the basehost under the virtual hostname you found.
-def BaseHost(host_name):
+### STEP 2: MODIFY JSON FILE
+
+def modify():
     # json_file = "/usr/local/m2/setting.json"
-
-    json_file = "C:\\Users\\Kim\\Desktop\\Assignments\\1_Hyundai_CDN\\setting.json"
+    json_file = "www.kia.com-acl.json"
     
     if not os.path.exists(json_file):
         print(f"JSON file '{json_file}' not found.")
-    else:
-        with open(json_file, 'r') as file:
-            data = json.load(file)
+    
+    with open(json_file, 'r') as file:
+        data = json.load(file)
+        hosting = data["hosting"]
         
         file.close()
+    return 0
+
+def add():
+    return 0
+
+def delete():
+    return 0
 
 def main():
-    configList = []
-    HostNames = ["www.kia.com", "www.kia.com-origin-root-kr-80", "www.kia.com-org-www-443", "www.kia.com-org-www-8005"] # Assume LogFiles -> HostName done
-    logLists = sorted(logLists, key=len)
-    
-    for host in HostNames:
-        config = BaseHost(host)
-        configList.append(config)
+    src = input("Type in the source URL:  ")
+    dst = input("Type in the destination URL:  ")
+    mode = input("What do you want to do? (choose from 'modify', 'add', or 'delete'): ").lower()
 
-    for configs in configList:
-        print(configs)
+    # Assume config file = 'www.kia.com-acl.json'
+
+    if mode=='modify':
+        modify()
+    elif mode=='add':
+        add()
+    elif mode=='delete':
+        delete()
 
     
 if __name__ == '__main__':
