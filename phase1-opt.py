@@ -3,8 +3,6 @@ import subprocess
 import json
 from urllib.parse import urlparse
 
-### STEP 0: RUN REDIRECTION LOG
-
 # Global variable
 ip_list = {'www.kia.com':'34.160.76.133',
             'www.hyundai.com':'34.107.246.212',
@@ -89,14 +87,12 @@ def grepString(url):
     return shellCommand
 
 # 1.3: After running the "grep" command, read the output log file names
-# NEED TO CONSIDER EDGE CASE
 def grepRun(grep_string):
     result = subprocess.run(grep_string, stdout=subprocess.PIPE, text=True, shell=True)
     log_files = result.stdout.splitlines()
     return log_files
 
 # 1.4: Open the log file, find the virtual host name between "id=- -" and "HTTP" (from the bottom)
-# Note: Assumed that "id=- -" and "HTTP" appears only once in each line
 def hostName(log_file):
     search = []
     host_name = ''
@@ -113,8 +109,7 @@ def hostName(log_file):
     file.close()
     return search[-1]
 
-# 1.5: Find the configuration file in "setting.json".
-# Configuration file location is next to the basehost under the virtual hostname you found.
+# Configuration file location is next to the basehost under the virtual hostname you found in "setting.json".
 def baseHost(host_name):
     json_file = "/usr/local/m2/setting.json"
     
@@ -131,10 +126,22 @@ def baseHost(host_name):
         
         file.close()
 
-def sub_main(src, dst, mode, is_redirected):
+def sub_sub_main(log_lists):
     host_names = []
     config_list = []    # Save it for STEP 2
+    for log in log_lists:
+        host_name = hostName(log)
+        # Remove redundant hostnames from host_names
+        if host_name not in host_names:
+            host_names.append(host_name)
+        print(f"Hostname found from '{log}' is '{host_name}'")
+    for host in host_names:
+        config_file = baseHost(host)
+        config_list.append(config_file)
+        print(f"\nBasehost for '{host}' is '{config_file}'\n")
+    return config_list
 
+def sub_main(src, dst, mode, is_redirected):
     # check==False --> Redirection rule already applied
     # check==True --> Redirection rule has not been applied
     if (((mode=='modify' or mode=='add') and is_redirected==True) or (mode=='delete' and is_redirected==False)):
@@ -144,25 +151,13 @@ def sub_main(src, dst, mode, is_redirected):
         print(f"Run {grep_string}\n")
 
         log_lists = sorted(grepRun(grep_string), key=len)   # The log file with the simpliest name has the priority
-        
-        for log in log_lists:
-            host_name = hostName(log)
-            # Need to remove redundant hostnames from host_names
-            if host_name not in host_names:
-                host_names.append(host_name)
-            print(f"Hostname found from '{log}' is '{host_name}'")
-        for host in host_names:
-            config_file = baseHost(host)
-            config_list.append(config_file)
-            print(f"\nBasehost for '{host}' is '{config_file}'\n")
-        return config_list
+        sub_sub_main(log_lists)
 
     elif ((mode=='modify' or mode=='add') and is_redirected==False): # modify / add -> location O (Stop)
         print(f"Redirection from '{src}' to '{dst}' has already applied.\n")
 
     elif (mode=='delete' and is_redirected==True):  # delete -> location X (Stop)
         print(f"Redirection from '{src}' to '{dst}' has already deleted.\n")
- 
 
 def main():
     # User input: source URL
@@ -180,7 +175,6 @@ def main():
     is_redirected = curlRun(curl_string, dst)
 
     sub_main(src, dst, mode, is_redirected) # return the list of configuration files
-
 
 if __name__=='__main__':
     main()
