@@ -17,16 +17,42 @@ global input = list of the configuration file, source url, destination
 3. Edit
 '''
 
-def is_config(config_file):
+def splitURL(url):
+    # https:// (protocol) www. (subdomain) kia.com (domain name) /hello/world/ (path/page)
+    try:
+        domain_path = url.split("://")[1] # domain_path = ['https', 'www.kia.com/hello/world/'][1] = 'www.kia.com/hello/world/'
+        domain = domain_path.split("/")[0] # domain = ['www.kia.com', 'hello', 'world', ''][0] = 'www.kia.com'
+        pattern = domain_path.replace(domain, "")
+        return pattern
+    except Exception:
+        return False
+
+def inputMode():
+    modes = ['modify', 'add', 'delete']
+    mode = input("What do you want to do? (choose from 'modify', 'add', or 'delete'): ").lower()
+    while mode not in modes:
+        print(f"\nMode '{mode}' is not a valid request")
+        mode = input("What do you want to do? (choose from 'modify', 'add', or 'delete'): ").lower()
+        if (mode in modes):
+            break
+    print("\n")
+    return mode
+
+def findPattern(config_file, pattern):
     if not os.path.exists(config_file):
         print(f"JSON file '{config_file}' not found.")
     
     with open(config_file, 'r') as file:
         data = json.load(file)
-        hosting = data["hosting"]
+        hosting = data["functions"]["network"]["http"]["frontEnd"]["accessControl"]["matchingList"]
+        for host in hosting:
+            if host["pattern"] == f"$URL[{pattern}]":
+                return host["location"]
+        return -1
+    
+def backup():
+    return 0
         
-        file.close()
-
 def modify():
     return 0
 
@@ -36,24 +62,56 @@ def add():
 def delete():
     return 0
 
+def sub_main(src, dst, mode, config_file, location):
+    if location == -1:
+        print(f"There is NO '{src}' found from '{config_file}'")
+        if mode == 'add':
+            print(f"PROCEED: Add the redirection rule from {src} to {dst}")
+        elif mode == 'modify':
+            ask_again = input(f"Do you want to add the redirection rule instead of modify? (y/n):  ")    # ask again
+            if ask_again == 'y':
+                mode = 'add'
+            else:
+                print("Cannot proceed. Exit the code.")
+        elif mode == 'delete':
+            print(f"Cannot delete the requested URL. Exit the code.")   # Can't delete
+            # quit()
+    else:
+        print(f"Current dst URL found from '{config_file}' is '{location}'")
+        if mode == 'add':
+            ask_again = input(f"Source URL {src} already exits; do you want to modify? (y/n):  ")    # ask again
+            if ask_again == 'y':
+                mode = 'modify'
+            else:
+                print("Cannot proceed. Exit the code.")
+        elif mode == 'modify':
+            if location == dst:
+                print(f"Redirection rule from '{src}' to '{dst}' has already applied")
+            else:
+                print(f"PROCEED: Modify the redirection rule from {src} to {dst}")
+        elif mode == 'delete':
+            if location != dst:
+                print(f"Redirection rule from '{src}' to '{dst}' has already deleted")
+                # quit()
+            else:
+                print(f"PROCEED: Delete the redirection rule from {src} to {dst}")
+
 def main():
-    # https://www.kia.com/nl/dealers/sliedrecht/
-    src = input("Type in the source URL:  ")
-    # https://www.kia.com/nl/dealers/0/
-    dst = input("Type in the destination URL:  ")
-    mode = input("What do you want to do? (choose from 'modify', 'add', or 'delete'): ").lower()
+    src = 'https://www.kia.com/nl/dealers/sliedrecht/'
+    pattern = splitURL(src)
+    # src = input("Type in the source URL:  ")
+    
+    #dst = 'https://www.kia.com/nl/dealers/0/'
+    dst = 'https://www.kia.com/nl/dealers/auto-dewaard/'
+    # dst = input("Type in the destination URL:  ")
+    mode = 'modify'
+    # mode = input("What do you want to do? (choose from 'modify', 'add', or 'delete'): ").lower()
 
     # Assume config file = 'www.kia.com-acl.json'
     config_file = "C:\\Users\\Kim\\Desktop\\Assignments\\1_Hyundai_CDN\\www.kia.com-acl.json"
-    is_config(config_file)
-    print(is_config)
+    location = findPattern(config_file, pattern)
 
-    if mode=='modify':
-        modify()
-    elif mode=='add':
-        add()
-    elif mode=='delete':
-        delete()
+    sub_main(src, dst, mode, config_file, location)
 
     
 if __name__ == '__main__':
