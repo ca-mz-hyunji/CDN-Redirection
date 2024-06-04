@@ -67,8 +67,8 @@ def curlString(lists, url, protocol, host):
     http = url.replace(protocol, "http", 1)
     final_url = http.replace(host, ip, 1) # 1 - only the first occurance will be replaced
 
-    shellString = 'curl -I -H "HOST:{}"'.format(host) + ' ' + final_url
-    return shellString
+    shell_string = 'curl -I -H "HOST:{}"'.format(host) + ' ' + final_url
+    return shell_string
 
 # 0.2: Check if the redirection rule has already applied
 def curlRun(curl_string, dstURL):
