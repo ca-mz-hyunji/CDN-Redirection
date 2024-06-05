@@ -53,8 +53,14 @@ def findPattern(config_file, pattern):
 def backup():
     return 0
         
-def modify():
-    return 0
+def modify(config_file, pattern, dst):
+    with open(config_file, 'r') as file:
+        data = json.load(file)
+        hosting = data["functions"]["network"]["http"]["frontEnd"]["accessControl"]["matchingList"]
+        for host in hosting:
+            if host["pattern"] == f"$URL[{pattern}]":
+                host["location"] = dst
+                print(host)
 
 def add():
     return 0
@@ -62,11 +68,12 @@ def add():
 def delete():
     return 0
 
-def sub_main(src, dst, mode, config_file, location):
+def sub_main(src, dst, mode, config_file, pattern, location):
     if location == -1:
         print(f"There is NO '{src}' found from '{config_file}'")
         if mode == 'add':
-            print(f"PROCEED: Add the redirection rule from {src} to {dst}")
+            print(f"PROCEED: ADD the redirection rule from {src} to {dst}")
+            # add(config_file, pattern, dst)
         elif mode == 'modify':
             ask_again = input(f"Do you want to add the redirection rule instead of modify? (y/n):  ")    # ask again
             if ask_again == 'y':
@@ -88,21 +95,23 @@ def sub_main(src, dst, mode, config_file, location):
             if location == dst:
                 print(f"Redirection rule from '{src}' to '{dst}' has already applied")
             else:
-                print(f"PROCEED: Modify the redirection rule from {src} to {dst}")
+                print(f"PROCEED: MODIFY the redirection rule from {src} to {dst}")
+                modify(config_file, pattern, dst)
         elif mode == 'delete':
             if location != dst:
                 print(f"Redirection rule from '{src}' to '{dst}' has already deleted")
                 # quit()
             else:
-                print(f"PROCEED: Delete the redirection rule from {src} to {dst}")
+                print(f"PROCEED: DELETE the redirection rule from {src} to {dst}")
+                # delete(config_file, pattern, dst)
 
 def main():
     src = 'https://www.kia.com/nl/dealers/sliedrecht/'
     pattern = splitURL(src)
     # src = input("Type in the source URL:  ")
     
-    #dst = 'https://www.kia.com/nl/dealers/0/'
-    dst = 'https://www.kia.com/nl/dealers/auto-dewaard/'
+    dst = 'https://www.kia.com/nl/dealers/0/'
+    # dst = 'https://www.kia.com/nl/dealers/auto-dewaard/'
     # dst = input("Type in the destination URL:  ")
     mode = 'modify'
     # mode = input("What do you want to do? (choose from 'modify', 'add', or 'delete'): ").lower()
@@ -111,7 +120,7 @@ def main():
     config_file = "C:\\Users\\Kim\\Desktop\\Assignments\\1_Hyundai_CDN\\www.kia.com-acl.json"
     location = findPattern(config_file, pattern)
 
-    sub_main(src, dst, mode, config_file, location)
+    sub_main(src, dst, mode, config_file, pattern, location)
 
     
 if __name__ == '__main__':

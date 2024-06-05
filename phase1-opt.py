@@ -1,7 +1,6 @@
 import os
 import subprocess
 import json
-from urllib.parse import urlparse
 
 # Global variable
 ip_list = {'www.kia.com':'34.160.76.133',
