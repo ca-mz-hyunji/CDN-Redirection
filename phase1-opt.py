@@ -91,7 +91,9 @@ def grepRun(grep_string):
     log_files = result.stdout.splitlines()
     return log_files
 
+## NEED TO FIND THE SRC URL
 # 1.4: Open the log file, find the virtual host name between "id=- -" and "HTTP" (from the bottom)
+'''
 def hostName(log_file):
     search = []
     host_name = ''
@@ -101,6 +103,23 @@ def hostName(log_file):
             id_index = line.find("id=- -")
             http_index = line.find("HTTP")
             if (id_index != -1) and (http_index != -1):
+                host_name = line[id_index+7:http_index-1]
+                search.append(host_name)
+            else:
+                None
+    file.close()
+    return search[-1]
+'''
+
+def hostName(src, log_file):
+    search = []
+    host_name = ''
+    with open(log_file, 'r') as file:
+        lines = file.readlines()    # return lists
+        for line in lines:
+            if src in line:
+                id_index = line.find("id=- -")
+                http_index = line.find("HTTP")
                 host_name = line[id_index+7:http_index-1]
                 search.append(host_name)
             else:
@@ -125,11 +144,11 @@ def baseHost(host_name):
         
         file.close()
 
-def sub_sub_main(log_lists):
+def sub_sub_main(src, log_lists):
     host_names = []
     config_list = []    # Save it for STEP 2
     for log in log_lists:
-        host_name = hostName(log)
+        host_name = hostName(log, src)
         # Remove redundant hostnames from host_names
         if host_name not in host_names:
             host_names.append(host_name)
@@ -150,7 +169,7 @@ def sub_main(src, dst, mode, is_redirected):
         print(f"Run {grep_string}\n")
 
         log_lists = sorted(grepRun(grep_string), key=len)   # The log file with the simpliest name has the priority
-        sub_sub_main(log_lists)
+        sub_sub_main(src, log_lists)
 
     elif ((mode=='modify' or mode=='add') and is_redirected==False): # modify / add -> location O (Stop)
         print(f"Redirection from '{src}' to '{dst}' has already applied.\n")
