@@ -1,4 +1,4 @@
-from helpers import splitURL, IP_dict
+from .helpers import splitURL, IP_dict
 
 # Step 1: Get inputs from User
 def userInput():

@@ -31,13 +31,15 @@ def main():
         return 0
     
     # Step 4: Grep Command --> Find Log Files (sort into shortest first)
-    log_files = grepCommand(path_from)
+    #log_files = grepCommand(path_from, "single")
+    log_files = ['C:\\Users\\Kim\\Desktop\\GitHub\\Automation\\CDNRedirection\\testing_files\\m2log_copy\\www.kia.com\\access.log',
+                     'C:\\Users\\Kim\\Desktop\\GitHub\\Automation\\CDNRedirection\\testing_files\\m2log_copy\\www.kia.com\\origin.log']
     
     # Step 5: Open the (shortest) log file (don't use /origin.log) and find Virtual Hostname for Path_from
-    virt_hosts = findVirtualHostname(log_files, path_from)
+    virt_hosts = findVirtualHostname(log_files, path_from, "single")
     
     # Step 6: Find BaseHost for the Virtual Hostname (from /usr/local/m2/setting.json)
-    base_hosts = findBaseHost(virt_hosts, domain)   # dictionary
+    base_hosts = findBaseHost(virt_hosts, "single")   # dictionary
     
     # Step 7: Open the JSON config file (located at BaseHost) and search for redirection rule (using Path_from)
     config_pattern, config_location, config_file_loc, config_checked = openConfigFile(base_hosts, path_from, src_url, dst_url, action)
@@ -53,9 +55,10 @@ def main():
         return 0
 
     # Step 9: Copy a backup file in a subdirectory
-    createBackup(config_file_loc)
+    #createBackup(config_file_loc)
 
-    config_file_loc = "/home/hji_kim/automation/www.kia.com-acl-testing.json"
+    #config_file_loc = "/home/hji_kim/automation/www.kia.com-acl-testing.json"
+    config_file_loc = "C:\\Users\\Kim\\Desktop\\GitHub\\Redirecting-Automation\\CDNRedirection\\testing_files\\www.kia.com-acl-testing.json"
 
     # Step 10: Update the Config File with redirection rule
     updateFile(path_from, dst_url, action, config_file_loc)

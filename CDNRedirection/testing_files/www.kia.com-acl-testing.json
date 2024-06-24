@@ -168,12 +168,6 @@
                 "denialCode": 301
               },
               {
-                "pattern": "$URL[/au/cars/sportage-hybrid.html]",
-                "action": "redirect",
-                "location": "https://www.kia.com/au/cars/sportage-hybrid/features.html",
-                "denialCode": 301
-              },
-              {
                 "pattern": "$URL[/es/business/overview/]",
                 "action": "redirect",
                 "location": "https://www.kia.com/es/programa-kia-empresas/kia-empresas/",

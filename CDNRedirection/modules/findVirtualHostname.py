@@ -1,6 +1,6 @@
 from .helpers import readUntilMatch
 
-def findVirtualHostname(log_files, path_from):
+def findVirtualHostname(log_files, path_from, mode):
     virt_hosts = []
 
     for log_file in log_files:
@@ -33,10 +33,12 @@ def findVirtualHostname(log_files, path_from):
     virt_hosts_filter = list(filter(lambda item: item is not None, virt_hosts))
     virt_hosts_sorted = sorted(virt_hosts_filter, key=len)
 
-    count = 1
-    for virt_host in virt_hosts_sorted:
-        print(f"Virtual Hostname {count}: [{virt_host}]\n")
-        count += 1
-
+    # Print sorted virtual host names (if not Excel mode)
+    if mode != "Excel":
+        count = 1
+        for virt_host in virt_hosts_sorted:
+            print(f"Virtual Hostname {count}: [{virt_host}]\n")
+            count += 1
+        print('\n')
 
     return virt_hosts_sorted

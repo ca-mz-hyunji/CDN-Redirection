@@ -11,8 +11,8 @@ from modules.checkActionExcel import checkActionExcel
 from modules.grepCommand import grepCommand
 from modules.findVirtualHostname import findVirtualHostname
 from modules.findBaseHost import findBaseHost
-from modules.openConfigFile import openConfigFile
-from modules.userConfirm import userConfirm
+from modules.openConfigFileExcel import openConfigFileExcel
+#from modules.userConfirm import userConfirm
 from modules.createBackup import createBackup
 from modules.updateFile import updateFile
 from modules.helpers import userData, border_msg
@@ -42,7 +42,7 @@ def main():
         loc_eq_dst, location = curlCommand(domain, ip, path_from, dst_url, "Excel")
 
         # For testing
-        print(f"[{user_input+1}]:\nsrc_url: {user_input_dict[user_input]['src_url']} --> dst_url: {user_input_dict[user_input]['dst_url']}\nCurr location: {location}")
+        # print(f"[{user_input+1}]:\nsrc_url: {user_input_dict[user_input]['src_url']} --> dst_url: {user_input_dict[user_input]['dst_url']}\nCurr location: {location}")
     
         # Step 3: Check the 8 cases (Add, Modify, Delete)
         new_action = checkActionExcel(src_url, loc_eq_dst, location, action)
@@ -58,20 +58,22 @@ def main():
         user_input_dict.pop(action_failed_index)
 
     for new_user_input in user_input_dict:
+        src_url, domain, ip, path_from, dst_url, action = userData(user_input_dict[new_user_input])
+
         # Step 4: Grep Command --> Find Log Files (sort into shortest first)
-        # log_files = grepCommand(path_from)
+        # log_files = grepCommand(path_from, 'Excel')
         # For testing on Windows
         log_files = ['C:\\Users\\Kim\\Desktop\\GitHub\\Automation\\CDNRedirection\\testing_files\\m2log_copy\\www.kia.com\\access.log',
                      'C:\\Users\\Kim\\Desktop\\GitHub\\Automation\\CDNRedirection\\testing_files\\m2log_copy\\www.kia.com\\origin.log']
             
         # Step 5: Open the (shortest) log file (don't use /origin.log) and find Virtual Hostname for Path_from
-        virt_hosts = findVirtualHostname(log_files, path_from)
+        virt_hosts = findVirtualHostname(log_files, path_from, 'Excel')
             
         # Step 6: Find BaseHost for the Virtual Hostname (from /usr/local/m2/setting.json)
-        base_hosts = findBaseHost(virt_hosts)   # dictionary
+        base_hosts = findBaseHost(virt_hosts, 'Excel')   # dictionary
             
         # Step 7: Open the JSON config file (located at BaseHost) and search for redirection rule (using Path_from)
-        config_pattern, config_location, config_file_loc, config_checked = openConfigFile(base_hosts, path_from, src_url, dst_url, action)
+        config_pattern, config_location, config_file_loc, config_checked = openConfigFileExcel(base_hosts, path_from, src_url, dst_url, action)
 
         if config_checked == False:
             check_config_failed[new_user_input] = user_input_dict[new_user_input]
@@ -95,6 +97,7 @@ def main():
         updateFile(path_from, dst_url, action, config_file_loc)
 
     ### TESTING ###
+    print("------------")
     for failed_index in domain_failed:
         print(f"Index {failed_index+1}: {domain_failed[failed_index]['src_url']} does not have a valid domain name. Try it again later.")
     print("------------")
@@ -104,9 +107,6 @@ def main():
     for config_failed_index in check_config_failed:
         user_input_dict.pop(config_failed_index)
         print(f"ERROR: Index [{config_failed_index+1}] with src_url: {check_config_failed[config_failed_index]['src_url']} could not find the rule in any configuration file")
-    print("------------")
-    for test in user_input_dict:
-        print(f"successfully {user_input_dict[test]['action']} the index [{test+1}]\n")
     print("------------")
 
     # Step 11: Deploy
