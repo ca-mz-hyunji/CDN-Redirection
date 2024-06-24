@@ -1,45 +1,36 @@
 import os
 import json
 
-from helpers import removeDuplicates
+from .helpers import removeDuplicates
 
 # Step 6: Find BaseHost for the Virtual Hostname (from /usr/local/m2/setting.json)
-def findBaseHost(virt_hosts, domain):
+def findBaseHost(virt_hosts):
     # virt_hosts == list
+    base_hosts = {}
+    for virt_host in virt_hosts:
+        base_hosts.setdefault(virt_host)
 
-    if(domain == "www.hyundai.com"):
-        new_base_hosts = {
-            'www.hyundai.com-worldwide-80' : '/usr/local/m2/setting.json/www.hyundai.com.json',
-            'www.hyundai.com': '/usr/local/m2/setting.json/www.hyundai.com-default.json'
-        }
+    json_file = "/usr/local/m2/setting.json"
+    # json_file = "c:\\Users\\Kim\\Desktop\\GitHub\\Automation\\CDNRedirection\\setting.json"
 
-        print("For Host with URL <www.hyundai.com>, the Base Hosts are pre-set to:")
+    if not os.path.exists(json_file):
+        print(f"JSON file '{json_file}' not found.")
 
-    else:
-        base_hosts = {}
-        for virt_host in virt_hosts:
-            base_hosts.setdefault(virt_host)
+    with open(json_file, 'r') as file:
+        data = json.load(file)
+        hosting = data["hosting"]
 
-        json_file = "/usr/local/m2/setting.json"
-        # json_file = "c:\\Users\\Kim\\Desktop\\GitHub\\Automation\\CDNRedirection\\setting.json"
-        
-        if not os.path.exists(json_file):
-            print(f"JSON file '{json_file}' not found.")
-        
-        with open(json_file, 'r') as file:
-            data = json.load(file)
-            hosting = data["hosting"]
+        for item in hosting:
+            if item["name"] in virt_hosts:
+                base_hosts[item["name"]] = item["mode"]["basehost"]
 
-            for item in hosting:
-                if item["name"] in virt_hosts:
-                    base_hosts[item["name"]] = item["mode"]["basehost"]
-
-        # Remove duplicates
-        new_base_hosts = removeDuplicates(base_hosts)
+    # Remove duplicates
+    new_base_hosts = removeDuplicates(base_hosts)
 
     count = 1
     for base_host in new_base_hosts:
-        print(f"Base Host {count}: [{new_base_hosts[base_host].split('/')[-1]}]\n")
+        print(f"Base Host {count}: [{new_base_hosts[base_host].split('/')[-1]}]")
         count += 1
+    print('\n')
 
     return new_base_hosts
