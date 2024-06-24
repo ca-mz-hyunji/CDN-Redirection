@@ -168,9 +168,9 @@
                 "denialCode": 301
               },
               {
-                "pattern": "$URL[/hello/world/]",
+                "pattern": "$URL[/au/cars/sportage-hybrid.html]",
                 "action": "redirect",
-                "location": "https://www.kia.com/bye/world/",
+                "location": "https://www.kia.com/au/cars/sportage-hybrid/features.html",
                 "denialCode": 301
               },
               {
@@ -183,6 +183,12 @@
                 "pattern": "$URL[/es/modelos/e-soul/]",
                 "action": "redirect",
                 "location": "https://www.kia.com/es/",
+                "denialCode": 301
+              },
+              {
+                "pattern": "$URL[/nl/dealers/sliedrecht/]",
+                "action": "redirect",
+                "location": "https://www.kia.com/nl/dealers/auto-dewaard/",
                 "denialCode": 301
               }
             ]
