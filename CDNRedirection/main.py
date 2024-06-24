@@ -55,6 +55,8 @@ def main():
     # Step 9: Copy a backup file in a subdirectory
     createBackup(config_file_loc)
 
+    config_file_loc = "/home/hji_kim/automation/www.kia.com-acl-testing.json"
+
     # Step 10: Update the Config File with redirection rule
     updateFile(path_from, dst_url, action, config_file_loc)
 

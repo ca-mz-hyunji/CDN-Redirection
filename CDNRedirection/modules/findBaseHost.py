@@ -10,8 +10,8 @@ def findBaseHost(virt_hosts):
     for virt_host in virt_hosts:
         base_hosts.setdefault(virt_host)
 
-    json_file = "/usr/local/m2/setting.json"
-    # json_file = "c:\\Users\\Kim\\Desktop\\GitHub\\Automation\\CDNRedirection\\setting.json"
+    # json_file = "/usr/local/m2/setting.json"
+    json_file = "C:\\Users\\Kim\\Desktop\\GitHub\\Redirecting-Automation\\CDNRedirection\\testing_files\\setting.json"
 
     if not os.path.exists(json_file):
         print(f"JSON file '{json_file}' not found.")

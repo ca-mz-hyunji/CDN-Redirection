@@ -44,15 +44,17 @@ def userInputcsv(excel_file_path):
         if user_input_dict[user_input]['domain'] == None:
             domain_failed[count] = user_input_dict[user_input]
         count += 1
-            
+    
     for failed_index in domain_failed:
-        border_msg(f"Index {failed_index+1}: {domain_failed[failed_index]['src_url']} does not have a valid domain name. Try it again later.")
+        # border_msg(f"Index {failed_index+1}: {domain_failed[failed_index]['src_url']} does not have a valid domain name. Try it again later.")
         user_input_dict.pop(failed_index)
     print("")
 
-    ### For testing purpose - delete later
+    ### For testing purpose
+    '''
     for item in user_input_dict:
         print(f"[{item+1}]: {user_input_dict[item]}\n")
+    '''
 
     return user_input_dict, domain_failed
 

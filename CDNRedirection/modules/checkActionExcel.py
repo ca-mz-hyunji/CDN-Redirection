@@ -29,22 +29,3 @@ def checkActionExcel(src_url, loc_eq_dst, location, action):
         return action 
     else: # Case 9: 404 Error (location = None)
         return action
-
-'''
-    1. Add & Destination==Location
-        * No need to ADD --> action = False
-    2. Add & Destination!=Location & Location!=SourceURL
-        * Need to check action again -> Did you mean MODIFY ?
-    3. Add & Desitnation!=Location & Location==SourceURL
-        * Good to ADD 
-    4. Modify & Destination==Location
-        * No need to MODIFY
-    5. Modify & Destination!=Location & Location==SourceURL
-        * Need to check action again -> Did you mean ADD ?
-    6. Modify & Destination!=Location & Location!=SourceURL
-        * Good to MODIFY
-    7. Delete & Destination!=Location
-        * Mo need to DELETE
-    8. Delete & Destination==Location
-        * Good to DELETE
-'''

@@ -1,4 +1,4 @@
-from helpers import readUntilMatch
+from .helpers import readUntilMatch
 
 def findVirtualHostname(log_files, path_from):
     virt_hosts = []

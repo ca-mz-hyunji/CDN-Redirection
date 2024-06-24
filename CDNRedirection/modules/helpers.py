@@ -19,7 +19,7 @@ IP_dict = {
 def splitURL(url):
     # url = https://www.kia.com/hello/world/
     try:
-        url = url.lower()
+        # url = url.lower()
         domain_path = url.split("://")[1] # domain_path = 'www.kia.com/hello/world/'
         domain = domain_path.split("/")[0] # domain = 'www.kia.com'
         path_from = domain_path.replace(domain, '') # path_from = '/hello/world/'
